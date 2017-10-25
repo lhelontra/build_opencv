@@ -1,6 +1,6 @@
 # build_opencv
 
-helps to compile opencv and build debian package.
+Multiarch cross compiling environment for opencv
 
 ## Edit tweaks like flags to enable or disable features, toolchain url, and others
 see configuration file examples in: configs/
