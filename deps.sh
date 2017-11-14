@@ -143,7 +143,7 @@ function install_deps() {
                 log_warn_msg "couldn't install $package_file"
             }
         else
-            fetch_packages+=" $package_file"
+            yesnoPrompt "Download local packages: $package_file [Y/n] " && fetch_cross_local_deps "$package_file"
         fi
     }
 

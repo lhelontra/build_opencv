@@ -394,7 +394,7 @@ while [ "$1" != "" ]; do
             }
             shift
         ;;
-        --build)
+        -b|--build)
             check_loadedConfig
             install_deps || exit 1
             dw_opencv || exit 1
@@ -414,7 +414,7 @@ while [ "$1" != "" ]; do
             }
             exit 0
         ;;
-        --dw-cross-deps)
+        -dw|--dw-cross-deps)
             check_loadedConfig
             [ "$CROSS_COMPILER" != "yes" ] && {
                 log_failure_msg "cross compiler is disabled."
