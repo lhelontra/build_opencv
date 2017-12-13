@@ -35,10 +35,13 @@ function fetch_cross_local_deps() {
     local new_loc=$(echo "$deps_path/usr" | sed 's./.\\/.g')
     local export_pkgconfig_path=""
 
-    for d in $(find ${deps_path}/ -type d -iname 'pkgconfig'); do
-        cd $d
+    for d in $(find ${deps_path}/ -type d -iname '*pkgconfig*'); do
         export_pkgconfig_path+="${d}:"
-        grep -Rl '/usr' | grep -v "$deps_path" | xargs sed -i "s/\/usr/${new_loc}/g" 2>/dev/null
+
+        for f in $(find $d -type f); do
+            cat $f | grep -iq "${deps_path}" || sed -i "s/\/usr/${new_loc}/g" $f 2>/dev/null
+        done
+
     done
 
     [ ! -z "$export_pkgconfig_path" ] && export_pkgconfig_path="PKG_CONFIG_LIBDIR=\"${export_pkgconfig_path:0:-1}\""
