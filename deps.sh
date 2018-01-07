@@ -98,7 +98,6 @@ function install_deps() {
 
     apt-get --allow-unauthenticated install wget unzip checkinstall build-essential cmake yasm pkg-config ||  {
         log_warn_msg "wget unzip checkinstall build-essential cmake yasm pkg-config"
-        return 1
     }
 
     echo "$FLAGS" | grep "V4L=ON" 1>/dev/null && {
