@@ -215,11 +215,14 @@ function cmakegen() {
             pattern+="set (CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)\n"
             pattern+="set (CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)\n"
             pattern+="set (CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)\n"
+            pattern+="set (OPENCV_EXTRA_C_FLAGS "\"${EXTRA_CXX_FLAGS}\"")\n"
+            pattern+="set (OPENCV_EXTRA_CXX_FLAGS "\"${EXTRA_CXX_FLAGS}\"")\n"
             sed -i "$pattern" ${toolchain_cmakefile}
         fi
 
     fi
 
+    # necessary for build opencv <= 3.4.0
     if [ ! -z "$EXTRA_CXX_FLAGS" ]; then
         log_app_msg "exporting cflags..."
         sed -i "/set(OPENCV_EXTRA_C_FLAGS \"\")/c\set(OPENCV_EXTRA_C_FLAGS \"${EXTRA_CXX_FLAGS}\")" ${cv_compileOptions}
