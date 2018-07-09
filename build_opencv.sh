@@ -193,6 +193,9 @@ function cmakegen() {
         [ -d "${CROSSTOOL_DIR}/${CROSSTOOL_NAME}/libc/lib" ] && EXTRA_CXX_FLAGS+=" -L${CROSSTOOL_DIR}/${CROSSTOOL_NAME}/libc/lib -Wl,-rpath-link,${CROSSTOOL_DIR}/${CROSSTOOL_NAME}/libc/lib"
         [ -d "${CROSSTOOL_DIR}/${CROSSTOOL_NAME}/libc/usr/lib" ] && EXTRA_CXX_FLAGS+=" -L${CROSSTOOL_DIR}/${CROSSTOOL_NAME}/libc/usr/lib -Wl,-rpath-link,${CROSSTOOL_DIR}/${CROSSTOOL_NAME}/libc/usr/lib"
 
+        # needs for linking opencv libraries in tbb.so
+        EXTRA_CXX_FLAGS+=" -Wl,-rpath-link,${WORKDIR}/opencv-${OPENCV_VERSION}/build/lib"
+
         if [ -d "${deps_path}" ]; then
             [ -f "${deps_path}/.sysinclude" ] && EXTRA_CXX_FLAGS+=" $(cat "${deps_path}/.sysinclude")"
             [ -f "${deps_path}/.syslib" ] && EXTRA_CXX_FLAGS+=" $(cat "${deps_path}/.syslib")"
