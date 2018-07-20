@@ -295,6 +295,7 @@ function cmakegen() {
         [ "$CROSS_COMPILER" == "yes" ] && [ -d "${deps_path}" ] && [ -f "${deps_path}/.pkgconfig" ] && {
             source "${deps_path}/.pkgconfig"
             export PKG_CONFIG_LIBDIR="$PKG_CONFIG_LIBDIR"
+            export PKG_CONFIG_PATH="$PKG_CONFIG_LIBDIR"
             FLAGS+=" -DPKG_CONFIG_EXECUTABLE=$(command -v pkg-config)"
         }
     }
