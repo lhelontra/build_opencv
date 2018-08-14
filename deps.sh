@@ -15,8 +15,12 @@ function fetch_cross_local_deps() {
 
     # creates a temporary dpkg status
     local temp_dpkg_status="${deb_path}/.status"
-    touch $temp_dpkg_status
-    apt-get install --no-install-recommends --print-uris --allow-unauthenticated -o Dir::State::status=${temp_dpkg_status} $packages 2>/dev/null | grep "http" |  awk '{ print $1 }' | tr -d "'" | while read url; do
+    > $temp_dpkg_status
+
+    local pkg_list=$(apt-cache depends --recurse --no-recommends --no-suggests --no-conflicts --no-breaks --no-replaces --no-enhances --no-pre-depends -o Dir::State::status=${temp_dpkg_status} $packages | grep "^\w")
+    local urls=$(apt-get download --print-uris --allow-unauthenticated -o Dir::State::status=${temp_dpkg_status} $pkg_list | grep "http" |  awk '{ print $1 }' | tr -d "'")
+
+    for url in $urls; do
 
         [ ! -f "${deb_path}/$(basename $url)" ] && {
             log_app_msg "Downloading: $url"
