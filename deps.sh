@@ -19,7 +19,10 @@ function fetch_cross_local_deps() {
         return 1
     }
 
-    apt-get --print-uris download $deps 2>/dev/null | grep "http://" |  awk '{ print $1 }' | tr -d "'" | while read url; do
+    # creates a temporary dpkg status
+    local temp_dpkg_status="${deb_path}/.status"
+    touch $temp_dpkg_status
+    apt-get -o Dir::State::status=${temp_dpkg_status} --allow-unauthenticated --print-uris download $deps 2>/dev/null | grep "http://" |  awk '{ print $1 }' | tr -d "'" | while read url; do
 
         [ ! -f "${deb_path}/$(basename $url)" ] && {
             log_app_msg "Downloading: $url"
