@@ -9,20 +9,14 @@ function fetch_cross_local_deps() {
 
     local deb_path="${WORKDIR}/cross_deps/debs/${CROSSTOOL_ARCH}"
     local deps_path="${WORKDIR}/cross_deps/deps/${CROSSTOOL_ARCH}"
-    local deps=$(apt-cache depends --recurse --no-recommends --no-suggests --no-conflicts --no-breaks --no-replaces --no-enhances --no-pre-depends ${packages} 2>/dev/null | grep "^\w" | grep -i "${CROSSTOOL_ARCH}")
 
     mkdir -p $deb_path
     mkdir -p $deps_path
 
-    [ -z "$deps" ] && {
-        log_warn_msg "not found requested packages: $packages"
-        return 1
-    }
-
     # creates a temporary dpkg status
     local temp_dpkg_status="${deb_path}/.status"
     touch $temp_dpkg_status
-    apt-get -o Dir::State::status=${temp_dpkg_status} --allow-unauthenticated --print-uris download $deps 2>/dev/null | grep "http://" |  awk '{ print $1 }' | tr -d "'" | while read url; do
+    apt-get install --no-install-recommends --print-uris --allow-unauthenticated -o Dir::State::status=${temp_dpkg_status} $packages 2>/dev/null | grep "http" |  awk '{ print $1 }' | tr -d "'" | while read url; do
 
         [ ! -f "${deb_path}/$(basename $url)" ] && {
             log_app_msg "Downloading: $url"
