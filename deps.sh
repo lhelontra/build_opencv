@@ -194,7 +194,7 @@ function install_deps() {
     }
 
     [ "$PYTHON2_SUPPORT" == "ON" ] && {
-        package_file="libpython-all-dev${arch} libpython-dev${arch} python-numpy"
+        package_file="libpython-all-dev${arch} libpython-dev${arch} python-dev${arch} python-numpy"
         if [ "$make_local_deps" == "no" ]; then
             apt-get --allow-unauthenticated install $package_file || {
                 log_warn_msg "couldn't install $package_file"
@@ -205,7 +205,7 @@ function install_deps() {
     }
 
     [ "$PYTHON3_SUPPORT" == "ON" ] && {
-        package_file="libpython3-all-dev${arch} libpython3-dev${arch} python3-numpy"
+        package_file="libpython3-all-dev${arch} libpython3-dev${arch} python3-dev${arch} python3-numpy"
         if [ "$make_local_deps" == "no" ]; then
             apt-get --allow-unauthenticated install $package_file || {
                 log_warn_msg "couldn't install $package_file"
