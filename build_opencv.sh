@@ -253,6 +253,12 @@ function cmakegen() {
                 local py2_inc="$(find ${deps_path}/ -type d -wholename '*include/python2*')"
                 local py2_lib="$(find ${deps_path}/ -iname '*libpython2*.so' | head -n1)"
                 local py2_np_inc="$(find ${deps_path}/ -wholename '*python2*numpy*core*include' | head -n1)"
+                local py2_executable=$(find ${deps_path}/ -type f -wholename '*bin/python2*' | sort | head -n1)
+
+                if [ -z "$py2_executable" ]; then
+                  log_failure_msg "not found python${py2_version} executable."
+                  exit 1
+                fi
 
                 if [ -z "$py2_inc" ]; then
                   log_failure_msg "not found python2 include path."
@@ -269,6 +275,8 @@ function cmakegen() {
                   exit 1
                 fi
 
+                # uses same python executable in crosscompiler
+                FLAGS+=" -DPYTHON2_EXECUTABLE=${py2_executable}"
                 FLAGS+=" -DPYTHON2_INCLUDE_PATH=${py2_inc}"
                 FLAGS+=" -DPYTHON2_LIBRARIES=${py2_lib}"
                 FLAGS+=" -DPYTHON2_NUMPY_INCLUDE_DIRS=${py2_np_inc}"
@@ -290,6 +298,12 @@ function cmakegen() {
                 local py3_inc="$(find ${deps_path}/ -type d -wholename '*include/python3*')"
                 local py3_lib="$(find ${deps_path}/ -iname '*libpython3*.so' | head -n1)"
                 local py3_np_inc="$(find ${deps_path}/ -wholename '*python3*numpy*core*include' | head -n1)"
+                local py3_executable=$(find ${deps_path}/ -type f -wholename '*bin/python3*' | sort | head -n1)
+
+                if [ -z "$py3_executable" ]; then
+                  log_failure_msg "not found python${py3_version} executable."
+                  exit 1
+                fi
 
                 if [ -z "$py3_inc" ]; then
                   log_failure_msg "not found python3 include path."
@@ -306,6 +320,8 @@ function cmakegen() {
                   exit 1
                 fi
 
+                # uses same python executable in crosscompiler
+                FLAGS+=" -DPYTHON3_EXECUTABLE=${py3_executable}"
                 FLAGS+=" -DPYTHON3_INCLUDE_PATH=${py3_inc}"
                 FLAGS+=" -DPYTHON3_LIBRARIES=${py3_lib}"
                 FLAGS+=" -DPYTHON3_NUMPY_INCLUDE_DIRS=${py3_np_inc}"
@@ -385,7 +401,7 @@ function makecv() {
     if [ "$PYTHON3_SUPPORT" == "ON" ] && [ "$CROSS_COMPILER" == "yes" ]; then
         local py3cv=$(ls ${WORKDIR}/opencv-${OPENCV_VERSION}/build/lib/python3/)
         local new_fn="$(echo $py3cv | sed -rn "s/cv2.cpython-([^-]+)-([^.]+)-.([^-]+).*/cv2.cpython-\1-${CROSSTOOL_NAME}.so/p")"
-        mv ${WORKDIR}/opencv-${OPENCV_VERSION}/build/lib/python3/$py3cv ${WORKDIR}/opencv-${OPENCV_VERSION}/build/lib/python3/$new_fn
+        mv ${WORKDIR}/opencv-${OPENCV_VERSION}/build/lib/python3/$py3cv ${WORKDIR}/opencv-${OPENCV_VERSION}/build/lib/python3/$new_fn 2>/dev/null
         grep -Rl "lib/python3/$py3cv" | xargs sed -i "s/$py3cv/$new_fn/g"
     fi
     return 0
