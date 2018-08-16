@@ -243,7 +243,7 @@ function cmakegen() {
 
             if [ ! -d "${deps_path}" ] && [ -z "$(echo $FLAGS | grep -i PYTHON2_INCLUDE_PATH)" ]; then
                 log_warn_msg "not found packages: libpython-all-dev${arch} python-numpy${arch}."
-                echo "Please runs this command: $0 -c <configfile> -dw-cross-deps \"libpython-all-dev${arch} python-numpy${arch}\""
+                echo "Please runs this command: $0 -c <configfile> --check-deps"
                 echo "or define PYTHON2_INCLUDE_PATH, PYTHON2_LIBRARIES, PYTHON2_NUMPY_INCLUDE_DIRS and PYTHON2_NUMPY_VERSION in config."
                 return 1
             fi
