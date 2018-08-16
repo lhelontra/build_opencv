@@ -130,7 +130,7 @@ function install_deps() {
         fi
     }
 
-    package_file="libatlas-dev${arch} libopenblas-dev${arch}"
+    package_file="libatlas-dev${arch} libopenblas-dev${arch} libatlas-base-dev${arch}"
     if [ "$make_local_deps" == "no" ]; then
         apt-get --allow-unauthenticated install $package_file || {
             log_warn_msg "couldn't install $package_file"
