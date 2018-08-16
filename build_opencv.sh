@@ -241,92 +241,86 @@ function cmakegen() {
 
         [ "$PYTHON2_SUPPORT" == "ON" ] && {
 
-            if [ ! -d "${deps_path}" ] && [ -z "$(echo $FLAGS | grep -i PYTHON2_INCLUDE_PATH)" ]; then
-                log_warn_msg "not found packages: libpython-all-dev${arch} python-numpy${arch}."
-                echo "Please runs this command: $0 -c <configfile> --check-deps"
-                echo "or define PYTHON2_INCLUDE_PATH, PYTHON2_LIBRARIES, PYTHON2_NUMPY_INCLUDE_DIRS and PYTHON2_NUMPY_VERSION in config."
-                return 1
+            if [ ! -d "${deps_path}" ]; then
+              log_warn_msg "not found cross libraries path."
+              echo "Please runs this command: $0 -c <configfile> --check-deps"
+              return 1
             fi
 
             # finds python2 libraries
-            if [ -z "$(echo $FLAGS | grep -i PYTHON2_INCLUDE_PATH)" ]; then
-                local py2_inc="$(find ${deps_path}/ -type d -wholename '*include/python2*')"
-                local py2_lib="$(find ${deps_path}/ -iname '*libpython2*.so' | head -n1)"
-                local py2_np_inc="$(find ${deps_path}/ -wholename '*python2*numpy*core*include' | head -n1)"
-                local py2_executable=$(find ${deps_path}/ -type f -wholename '*bin/python2*' | sort | head -n1)
+            local py2_inc="$(find ${deps_path}/ -type d -wholename '*include/python2*')"
+            local py2_lib="$(find ${deps_path}/ -iname '*libpython2*.so' | head -n1)"
+            local py2_np_inc="$(find ${deps_path}/ -wholename '*python2*numpy*core*include' | head -n1)"
+            local py2_executable=$(find ${deps_path}/ -type f -wholename '*bin/python2*' | sort | head -n1)
 
-                if [ -z "$py2_executable" ]; then
-                  log_failure_msg "not found python${py2_version} executable."
-                  exit 1
-                fi
-
-                if [ -z "$py2_inc" ]; then
-                  log_failure_msg "not found python2 include path."
-                  exit 1
-                fi
-
-                if [ -z "$py2_lib" ]; then
-                  log_failure_msg "not found python2 libraries path."
-                  exit 1
-                fi
-
-                if [ -z "$py2_np_inc" ]; then
-                  log_failure_msg "not found numpy for python2 include path."
-                  exit 1
-                fi
-
-                # uses same python executable in crosscompiler
-                FLAGS+=" -DPYTHON2_EXECUTABLE=${py2_executable}"
-                FLAGS+=" -DPYTHON2_INCLUDE_PATH=${py2_inc}"
-                FLAGS+=" -DPYTHON2_LIBRARIES=${py2_lib}"
-                FLAGS+=" -DPYTHON2_NUMPY_INCLUDE_DIRS=${py2_np_inc}"
-                FLAGS+=" -DPYTHON2_NUMPY_VERSION=$(cat $(find ${deps_path}/ -wholename '*python2*numpy-*.egg*' | grep -i 'PKG-INFO') | grep -i "version" | tail -n1 | awk '{ print $2 }')"
+            if [ -z "$py2_executable" ]; then
+              log_failure_msg "not found python${py2_version} executable."
+              exit 1
             fi
+
+            if [ -z "$py2_inc" ]; then
+              log_failure_msg "not found python2 include path."
+              exit 1
+            fi
+
+            if [ -z "$py2_lib" ]; then
+              log_failure_msg "not found python2 libraries path."
+              exit 1
+            fi
+
+            if [ -z "$py2_np_inc" ]; then
+              log_failure_msg "not found numpy for python2 include path."
+              exit 1
+            fi
+
+            # uses same python executable in crosscompiler
+            FLAGS+=" -DPYTHON2_EXECUTABLE=${py2_executable}"
+            FLAGS+=" -DPYTHON2_INCLUDE_PATH=${py2_inc}"
+            FLAGS+=" -DPYTHON2_LIBRARIES=${py2_lib}"
+            FLAGS+=" -DPYTHON2_NUMPY_INCLUDE_DIRS=${py2_np_inc}"
+            FLAGS+=" -DPYTHON2_NUMPY_VERSION=$(cat $(find ${deps_path}/ -wholename '*python2*numpy-*.egg*' | grep -i 'PKG-INFO') | grep -i "version" | tail -n1 | awk '{ print $2 }')"
         }
 
         [ "$PYTHON3_SUPPORT" == "ON" ] && {
-            if [ ! -d "${deps_path}" ] && [ -z "$(echo $FLAGS | grep -i PYTHON3_INCLUDE_PATH)" ]; then
-                log_warn_msg "not found packages: libpython3-all-dev${arch} python3-numpy${arch}."
-                echo "Please runs this command: $0 -c <configfile> -dw-cross-deps \"libpython3-all-dev${arch} python3-numpy${arch}\""
-                echo "or define PYTHON3_INCLUDE_PATH, PYTHON3_LIBRARIES, PYTHON3_NUMPY_INCLUDE_DIRS and PYTHON3_NUMPY_VERSION in config."
-                return 1
+
+            if [ ! -d "${deps_path}" ]; then
+              log_warn_msg "not found cross libraries path."
+              echo "Please runs this command: $0 -c <configfile> --check-deps"
+              return 1
             fi
 
             # finds python3 libraries
-            if [ -z "$(echo $FLAGS | grep -i PYTHON3_INCLUDE_PATH)" ]; then
+            local py3_inc="$(find ${deps_path}/ -type d -wholename '*include/python3*')"
+            local py3_lib="$(find ${deps_path}/ -iname '*libpython3*.so' | head -n1)"
+            local py3_np_inc="$(find ${deps_path}/ -wholename '*python3*numpy*core*include' | head -n1)"
+            local py3_executable=$(find ${deps_path}/ -type f -wholename '*bin/python3*' | sort | head -n1)
 
-                local py3_inc="$(find ${deps_path}/ -type d -wholename '*include/python3*')"
-                local py3_lib="$(find ${deps_path}/ -iname '*libpython3*.so' | head -n1)"
-                local py3_np_inc="$(find ${deps_path}/ -wholename '*python3*numpy*core*include' | head -n1)"
-                local py3_executable=$(find ${deps_path}/ -type f -wholename '*bin/python3*' | sort | head -n1)
-
-                if [ -z "$py3_executable" ]; then
-                  log_failure_msg "not found python${py3_version} executable."
-                  exit 1
-                fi
-
-                if [ -z "$py3_inc" ]; then
-                  log_failure_msg "not found python3 include path."
-                  exit 1
-                fi
-
-                if [ -z "$py3_lib" ]; then
-                  log_failure_msg "not found python3 libraries path."
-                  exit 1
-                fi
-
-                if [ -z "$py3_np_inc" ]; then
-                  log_failure_msg "not found numpy for python3 include path."
-                  exit 1
-                fi
-
-                # uses same python executable in crosscompiler
-                FLAGS+=" -DPYTHON3_EXECUTABLE=${py3_executable}"
-                FLAGS+=" -DPYTHON3_INCLUDE_PATH=${py3_inc}"
-                FLAGS+=" -DPYTHON3_LIBRARIES=${py3_lib}"
-                FLAGS+=" -DPYTHON3_NUMPY_INCLUDE_DIRS=${py3_np_inc}"
-                FLAGS+=" -DPYTHON3_NUMPY_VERSION=$(cat $(find ${deps_path}/ -wholename '*python3*numpy-*.egg*' | grep -i 'PKG-INFO') | grep -i "version" | tail -n1 | awk '{ print $2 }')"
+            if [ -z "$py3_executable" ]; then
+              log_failure_msg "not found python${py3_version} executable."
+              exit 1
             fi
+
+            if [ -z "$py3_inc" ]; then
+              log_failure_msg "not found python3 include path."
+              exit 1
+            fi
+
+            if [ -z "$py3_lib" ]; then
+              log_failure_msg "not found python3 libraries path."
+              exit 1
+            fi
+
+            if [ -z "$py3_np_inc" ]; then
+              log_failure_msg "not found numpy for python3 include path."
+              exit 1
+            fi
+
+            # uses same python executable in crosscompiler
+            FLAGS+=" -DPYTHON3_EXECUTABLE=${py3_executable}"
+            FLAGS+=" -DPYTHON3_INCLUDE_PATH=${py3_inc}"
+            FLAGS+=" -DPYTHON3_LIBRARIES=${py3_lib}"
+            FLAGS+=" -DPYTHON3_NUMPY_INCLUDE_DIRS=${py3_np_inc}"
+            FLAGS+=" -DPYTHON3_NUMPY_VERSION=$(cat $(find ${deps_path}/ -wholename '*python3*numpy-*.egg*' | grep -i 'PKG-INFO') | grep -i "version" | tail -n1 | awk '{ print $2 }')"
         }
 
         FLAGS+=" -DGCC_COMPILER_VERSION=${gcc_version}"
