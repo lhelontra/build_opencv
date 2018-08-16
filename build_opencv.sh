@@ -394,7 +394,8 @@ function makecv() {
     # rename python3 module, if is crosscompiler mode
     if [ "$PYTHON3_SUPPORT" == "ON" ] && [ "$CROSS_COMPILER" == "yes" ]; then
         local py3cv=$(ls ${WORKDIR}/opencv-${OPENCV_VERSION}/build/lib/python3/)
-        local new_fn="$(echo $py3cv | sed -rn "s/cv2.cpython-([^-]+)-([^.]+)-.([^-]+).*/cv2.cpython-\1-${CROSSTOOL_NAME}.so/p")"
+        # local new_fn="$(echo $py3cv | sed -rn "s/cv2.cpython-([^-]+)-([^.]+)-.([^-]+).*/cv2.cpython-\1-${CROSSTOOL_NAME}.so/p")"
+        local new_fn="cv2.so"
         mv ${WORKDIR}/opencv-${OPENCV_VERSION}/build/lib/python3/$py3cv ${WORKDIR}/opencv-${OPENCV_VERSION}/build/lib/python3/$new_fn 2>/dev/null
         grep -Rl "lib/python3/$py3cv" | xargs sed -i "s/$py3cv/$new_fn/g"
     fi
