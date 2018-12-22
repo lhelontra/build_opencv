@@ -77,6 +77,8 @@ function dw_opencv() {
         return 0
     fi
 
+    [ -f "$OPENCV_SRC_FILENAME" ] && rm -f "$OPENCV_SRC_FILENAME"
+
     log_app_msg "Downloading opencv https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip..."
     wget --no-check-certificate -q -c https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip -O "$OPENCV_SRC_FILENAME" || return 1
 
@@ -99,6 +101,8 @@ function dw_opencv_contrib() {
         log_app_msg "opencv-contrib exists."
         return 0
     fi
+
+    [ -f "$OPENCV_CONTRIB_SRC_FILENAME" ] && rm -f "$OPENCV_CONTRIB_SRC_FILENAME"
 
     log_app_msg "Downloading opencv contrib https://github.com/opencv/opencv_contrib/archive/${OPENCV_VERSION}.zip..."
     wget --no-check-certificate -q -c https://github.com/opencv/opencv_contrib/archive/${OPENCV_VERSION}.zip -O "$OPENCV_CONTRIB_SRC_FILENAME" || return 1
