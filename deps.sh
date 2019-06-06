@@ -118,6 +118,18 @@ function install_deps() {
             log_warn_msg "couldn't install opencl-headers"
         }
     }
+    
+    echo "$FLAGS" | grep "WITH_GSTREAMER=ON" 1>/dev/null && {
+        package_file="libgstreamer1.0-dev${arch} libgstreamer-plugins-base1.0-dev${arch}"
+        if [ "$make_local_deps" == "no" ]; then
+            apt-get --allow-unauthenticated install $package_file || {
+                log_warn_msg "couldn't install $package_file"
+            }
+        else
+            yesnoPrompt "Download local packages: $package_file [Y/n] " && fetch_cross_local_deps "$package_file"
+        fi
+    }
+    WITH_GSTREAMER
 
     echo "$FLAGS" | grep "WITH_OPENCLAMDBLAS=ON" 1>/dev/null && {
         package_file="libclblas-dev${arch}"
