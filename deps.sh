@@ -118,7 +118,7 @@ function install_deps() {
             log_warn_msg "couldn't install opencl-headers"
         }
     }
-    
+
     echo "$FLAGS" | grep "WITH_GSTREAMER=ON" 1>/dev/null && {
         package_file="libgstreamer1.0-dev${arch} libgstreamer-plugins-base1.0-dev${arch}"
         if [ "$make_local_deps" == "no" ]; then
@@ -205,7 +205,7 @@ function install_deps() {
         fi
     }
 
-    [ "$PYTHON2_SUPPORT" == "ON" ] && {
+    echo "$FLAGS" | grep "BUILD_opencv_python2=ON" 1>/dev/null && {
         package_file="libpython-all-dev${arch} libpython-dev${arch} python-dev${arch} python-numpy"
         if [ "$make_local_deps" == "no" ]; then
             apt-get --allow-unauthenticated install $package_file || {
@@ -216,7 +216,7 @@ function install_deps() {
         fi
     }
 
-    [ "$PYTHON3_SUPPORT" == "ON" ] && {
+    echo "$FLAGS" | grep "BUILD_opencv_python3=ON" 1>/dev/null && {
         package_file="libpython3-all-dev${arch} libpython3-dev${arch} python3-dev${arch} python3-numpy"
         if [ "$make_local_deps" == "no" ]; then
             apt-get --allow-unauthenticated install $package_file || {

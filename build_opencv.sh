@@ -243,7 +243,7 @@ function cmakegen() {
 
     [ "$CROSS_COMPILER" == "yes" ] && {
 
-        [ "$PYTHON2_SUPPORT" == "ON" ] && {
+        echo "$FLAGS" | grep "BUILD_opencv_python2=ON" 1>/dev/null && {
 
             if [ ! -d "${deps_path}" ]; then
               log_warn_msg "not found cross libraries path."
@@ -285,7 +285,7 @@ function cmakegen() {
             FLAGS+=" -DPYTHON2_NUMPY_VERSION=$(cat $(find ${deps_path}/ -wholename '*python2*numpy-*.egg*' | grep -i 'PKG-INFO') | grep -i "version" | tail -n1 | awk '{ print $2 }')"
         }
 
-        [ "$PYTHON3_SUPPORT" == "ON" ] && {
+        echo "$FLAGS" | grep "BUILD_opencv_python3=ON" 1>/dev/null && {
 
             if [ ! -d "${deps_path}" ]; then
               log_warn_msg "not found cross libraries path."
@@ -394,15 +394,6 @@ function makecv() {
         log_failure_msg "ERROR: failed make"
         return 1
     }
-
-    # rename python3 module, if is crosscompiler mode
-    if [ "$PYTHON3_SUPPORT" == "ON" ] && [ "$CROSS_COMPILER" == "yes" ]; then
-        local py3cv=$(ls ${WORKDIR}/opencv-${OPENCV_VERSION}/build/lib/python3/)
-        # local new_fn="$(echo $py3cv | sed -rn "s/cv2.cpython-([^-]+)-([^.]+)-.([^-]+).*/cv2.cpython-\1-${CROSSTOOL_NAME}.so/p")"
-        local new_fn="cv2.so"
-        mv ${WORKDIR}/opencv-${OPENCV_VERSION}/build/lib/python3/$py3cv ${WORKDIR}/opencv-${OPENCV_VERSION}/build/lib/python3/$new_fn 2>/dev/null
-        grep -Rl "lib/python3/$py3cv" | xargs sed -i "s/$py3cv/$new_fn/g"
-    fi
     return 0
 }
 
