@@ -129,7 +129,6 @@ function install_deps() {
             yesnoPrompt "Download local packages: $package_file [Y/n] " && fetch_cross_local_deps "$package_file"
         fi
     }
-    WITH_GSTREAMER
 
     echo "$FLAGS" | grep "WITH_OPENCLAMDBLAS=ON" 1>/dev/null && {
         package_file="libclblas-dev${arch}"
