@@ -108,9 +108,14 @@ function install_deps() {
     }
 
     echo "$FLAGS" | grep "WITH_EIGEN=ON" 1>/dev/null && {
-        apt-get --allow-unauthenticated install libeigen3-dev || {
-            log_warn_msg "couldn't install libeigen3-dev"
-        }
+        package_file="libeigen3-dev"
+        if [ "$make_local_deps" == "no" ]; then
+            apt-get --allow-unauthenticated install $package_file || {
+                log_warn_msg "couldn't install $package_file"
+            }
+        else
+            yesnoPrompt "Download local packages: $package_file [Y/n] " && fetch_cross_local_deps "$package_file"
+        fi
     }
 
     echo "$FLAGS" | grep "WITH_OPENCL=ON" 1>/dev/null && {
