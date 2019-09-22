@@ -232,6 +232,7 @@ function cmakegen() {
     # necessary for build opencv <= 3.4.0
     if [ ! -z "$EXTRA_CXX_FLAGS" ]; then
         log_app_msg "exporting cflags..."
+        [ "$CROSS_COMPILER" == "yes" ] && EXTRA_CXX_FLAGS="${EXTRA_CXX_FLAGS} -Wl,--unresolved-symbols=ignore-all"
         sed -i "/set(OPENCV_EXTRA_C_FLAGS \"\")/c\set(OPENCV_EXTRA_C_FLAGS \"${EXTRA_CXX_FLAGS}\")" ${cv_compileOptions}
         sed -i "/set(OPENCV_EXTRA_CXX_FLAGS \"\")/c\set(OPENCV_EXTRA_CXX_FLAGS \"${EXTRA_CXX_FLAGS}\")" ${cv_compileOptions}
         export CFLAGS="$EXTRA_CXX_FLAGS"
