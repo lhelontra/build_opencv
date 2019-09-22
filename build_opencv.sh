@@ -197,6 +197,9 @@ function cmakegen() {
         [ -d "${CROSSTOOL_DIR}/${CROSSTOOL_NAME}/libc/lib" ] && EXTRA_CXX_FLAGS+=" -L${CROSSTOOL_DIR}/${CROSSTOOL_NAME}/libc/lib -Wl,-rpath-link,${CROSSTOOL_DIR}/${CROSSTOOL_NAME}/libc/lib"
         [ -d "${CROSSTOOL_DIR}/${CROSSTOOL_NAME}/libc/usr/lib" ] && EXTRA_CXX_FLAGS+=" -L${CROSSTOOL_DIR}/${CROSSTOOL_NAME}/libc/usr/lib -Wl,-rpath-link,${CROSSTOOL_DIR}/${CROSSTOOL_NAME}/libc/usr/lib"
 
+        # fixes some undefined symbol issues
+        EXTRA_CXX_FLAGS+=" -Wl,--unresolved-symbols=ignore-all"
+
         # needs for linking opencv libraries in tbb.so
         EXTRA_CXX_FLAGS+=" -Wl,-rpath-link,${WORKDIR}/opencv-${OPENCV_VERSION}/build/lib"
 
@@ -232,7 +235,6 @@ function cmakegen() {
     # necessary for build opencv <= 3.4.0
     if [ ! -z "$EXTRA_CXX_FLAGS" ]; then
         log_app_msg "exporting cflags..."
-        [ "$CROSS_COMPILER" == "yes" ] && EXTRA_CXX_FLAGS="${EXTRA_CXX_FLAGS} -Wl,--unresolved-symbols=ignore-all"
         sed -i "/set(OPENCV_EXTRA_C_FLAGS \"\")/c\set(OPENCV_EXTRA_C_FLAGS \"${EXTRA_CXX_FLAGS}\")" ${cv_compileOptions}
         sed -i "/set(OPENCV_EXTRA_CXX_FLAGS \"\")/c\set(OPENCV_EXTRA_CXX_FLAGS \"${EXTRA_CXX_FLAGS}\")" ${cv_compileOptions}
         export CFLAGS="$EXTRA_CXX_FLAGS"
