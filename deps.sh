@@ -125,7 +125,7 @@ function install_deps() {
     }
 
     echo "$FLAGS" | grep "WITH_GSTREAMER=ON" 1>/dev/null && {
-        package_file="libgstreamer1.0-dev${arch} libgstreamer-plugins-base1.0-dev${arch} libgstreamer-plugins-bad1.0-dev${arch} gstreamer1.0-plugins-good${arch} gstreamer1.0-plugins-ugly${arch}"
+        package_file="libgstreamer1.0-dev${arch} libgstreamer-plugins-base1.0-dev${arch}"
         if [ "$make_local_deps" == "no" ]; then
             apt-get --allow-unauthenticated install $package_file || {
                 log_warn_msg "couldn't install $package_file"
