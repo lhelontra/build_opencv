@@ -177,17 +177,6 @@ function install_deps() {
         fi
     }
 
-    echo "$FLAGS" | grep "WITH_LAPACK=ON" 1>/dev/null && {
-        package_file="liblapack-dev${arch} liblapacke-dev${arch}"
-        if [ "$make_local_deps" == "no" ]; then
-            apt-get --allow-unauthenticated install $package_file || {
-                log_warn_msg "couldn't install $package_file"
-            }
-        else
-            yesnoPrompt "Download local packages: $package_file [Y/n] " && fetch_cross_local_deps "$package_file"
-        fi
-    }
-
     echo "$FLAGS" | grep "WITH_FFMPEG=ON" 1>/dev/null && {
         package_file="libavcodec-dev${arch} libavformat-dev${arch} libswscale-dev${arch} libavresample-dev${arch} libx264-dev${arch} libavutil-dev${arch}"
         if [ "$make_local_deps" == "no" ]; then
