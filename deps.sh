@@ -126,13 +126,15 @@ function install_deps() {
 
     echo "$FLAGS" | grep "WITH_GSTREAMER=ON" 1>/dev/null && {
         package_file="libgstreamer1.0-dev${arch} libgstreamer-plugins-base1.0-dev${arch}"
-        if [ "$make_local_deps" == "no" ]; then
-            apt-get --allow-unauthenticated install $package_file || {
-                log_warn_msg "couldn't install $package_file"
-            }
-        else
-            yesnoPrompt "Download local packages: $package_file [Y/n] " && fetch_cross_local_deps "$package_file"
-        fi
+        for p in $package_file; do
+            if [ "$make_local_deps" == "no" ]; then
+                apt-get --allow-unauthenticated install $p || {
+                    log_warn_msg "couldn't install $p"
+                }
+            else
+                yesnoPrompt "Download local packages: $p [Y/n] " && fetch_cross_local_deps "$p"
+            fi
+        done
     }
 
     echo "$FLAGS" | grep "WITH_OPENCLAMDBLAS=ON" 1>/dev/null && {
@@ -147,13 +149,15 @@ function install_deps() {
     }
 
     package_file="libatlas-dev${arch} libopenblas-dev${arch} libatlas-base-dev${arch}"
-    if [ "$make_local_deps" == "no" ]; then
-        apt-get --allow-unauthenticated install $package_file || {
-            log_warn_msg "couldn't install $package_file"
-        }
-    else
-        yesnoPrompt "Download local packages: $package_file [Y/n] " && fetch_cross_local_deps "$package_file"
-    fi
+    for p in $package_file; do
+        if [ "$make_local_deps" == "no" ]; then
+            apt-get --allow-unauthenticated install $p || {
+                log_warn_msg "couldn't install $p"
+            }
+        else
+            yesnoPrompt "Download local packages: $p [Y/n] " && fetch_cross_local_deps "$p"
+        fi
+    done
 
     echo "$FLAGS" | grep "WITH_GTK=ON" 1>/dev/null && {
         yesnoPrompt "Gtk gui was selected, whats version [2/3] " && package_file="libgtk2.0-dev${arch}" || package_file="libgtk-3-dev${arch}"
@@ -167,25 +171,29 @@ function install_deps() {
     }
 
     echo "$FLAGS" | grep "WITH_QT=ON" 1>/dev/null && {
-        package_file="qt5-default${arch}"
-        if [ "$make_local_deps" == "no" ]; then
-            apt-get --allow-unauthenticated install $package_file || {
-                log_warn_msg "couldn't install $package_file"
-            }
-        else
-            yesnoPrompt "Download local packages: $package_file [Y/n] " && fetch_cross_local_deps "$package_file"
-        fi
+        package_file="qt5-default${arch} qtbase5-dev${arch}"
+        for p in $package_file; do
+            if [ "$make_local_deps" == "no" ]; then
+                apt-get --allow-unauthenticated install $p || {
+                    log_warn_msg "couldn't install $p"
+                }
+            else
+                yesnoPrompt "Download local packages: $p [Y/n] " && fetch_cross_local_deps "$p"
+            fi
+        done
     }
 
     echo "$FLAGS" | grep "WITH_FFMPEG=ON" 1>/dev/null && {
         package_file="libavcodec-dev${arch} libavformat-dev${arch} libswscale-dev${arch} libavresample-dev${arch} libx264-dev${arch} libavutil-dev${arch}"
-        if [ "$make_local_deps" == "no" ]; then
-            apt-get --allow-unauthenticated install $package_file || {
-                log_warn_msg "couldn't install $package_file"
-            }
-        else
-            yesnoPrompt "Download local packages: $package_file [Y/n] " && fetch_cross_local_deps "$package_file"
-        fi
+        for p in $package_file; do
+            if [ "$make_local_deps" == "no" ]; then
+                apt-get --allow-unauthenticated install $p || {
+                    log_warn_msg "couldn't install $p"
+                }
+            else
+                yesnoPrompt "Download local packages: $p [Y/n] " && fetch_cross_local_deps "$p"
+            fi
+        done
     }
 
     echo "$FLAGS" | grep "WITH_1394=ON" 1>/dev/null && {
