@@ -181,6 +181,17 @@ function cmakegen() {
         sleep 1
     fi
 
+    # fix missing headers of blas/lapack inn crosscompilation mode
+    if [ "$CROSS_COMPILER" == "yes" ] && [ ! -f  "${deps_path}"/usr/include/cblas.h ]; then
+        echo "$FLAGS" | grep "WITH_LAPACK=ON" 1>/dev/null && {
+            local blas_lapack_dir="$(dirname $(find "${deps_path}" -iwholename '*include*/*blas*' | grep -v 'Eigen' | tail -n1))"
+            cp -a "${blas_lapack_dir}"/cblas-atlas.h "${deps_path}"/usr/include/cblas.h &>/dev/null
+            cp -a "${blas_lapack_dir}"/cblas* "${deps_path}"/usr/include/ &>/dev/null
+            cp -a "${blas_lapack_dir}"/clapack.h "${deps_path}"/usr/include/ &>/dev/null
+            log_warn_msg "install liblapacke-dev${CROSSTOOL_ARCH} again"
+            sleep 10
+        }
+    fi
 
     if [ "$CROSS_COMPILER" == "yes" ]; then
         # finds the include folder of cross-compiler toolchain
@@ -255,10 +266,17 @@ function cmakegen() {
             fi
 
             # finds python2 libraries
+            if [ "$PYTHON_VENV" == "ON" ]; then
+                local py2_np_inc="$(python -c 'import numpy as np;print(np.get_include())')"
+                local py2_executable="$(command -v python)"
+                local py2_numpy_version="$(python -c 'import numpy as np;print(np.__version__)')"
+            else
+                local py2_np_inc="$(find ${deps_path}/ -wholename '*python2*numpy*core*include' | head -n1)"
+                local py2_executable=$(find ${deps_path}/ -type f -wholename '*bin/python2*' | sort | head -n1)
+                local py2_numpy_version="$(cat $(find ${deps_path}/ -wholename '*python2*numpy-*.egg*' | grep -i 'PKG-INFO') | grep -i "version" | tail -n1 | awk '{ print $2 }')"
+            fi
             local py2_inc="$(find ${deps_path}/ -type d -wholename '*include/python2*')"
             local py2_lib="$(find ${deps_path}/ -iname '*libpython2*.so' | head -n1)"
-            local py2_np_inc="$(find ${deps_path}/ -wholename '*python2*numpy*core*include' | head -n1)"
-            local py2_executable=$(find ${deps_path}/ -type f -wholename '*bin/python2*' | sort | head -n1)
 
             if [ -z "$py2_executable" ]; then
               log_failure_msg "not found python${py2_version} executable."
@@ -285,7 +303,7 @@ function cmakegen() {
             FLAGS+=" -DPYTHON2_INCLUDE_PATH=${py2_inc}"
             FLAGS+=" -DPYTHON2_LIBRARIES=${py2_lib}"
             FLAGS+=" -DPYTHON2_NUMPY_INCLUDE_DIRS=${py2_np_inc}"
-            FLAGS+=" -DPYTHON2_NUMPY_VERSION=$(cat $(find ${deps_path}/ -wholename '*python2*numpy-*.egg*' | grep -i 'PKG-INFO') | grep -i "version" | tail -n1 | awk '{ print $2 }')"
+            FLAGS+=" -DPYTHON2_NUMPY_VERSION=${py2_numpy_version}"
         }
 
         echo "$FLAGS" | grep "BUILD_opencv_python3=ON" 1>/dev/null && {
@@ -297,10 +315,17 @@ function cmakegen() {
             fi
 
             # finds python3 libraries
+            if [ "$PYTHON_VENV" == "ON" ]; then
+                local py3_np_inc="$(python -c 'import numpy as np;print(np.get_include())')"
+                local py3_executable="$(command -v python)"
+                local py3_numpy_version="$(python -c 'import numpy as np;print(np.__version__)')"
+            else 
+                local py3_np_inc="$(find ${deps_path}/ -wholename '*python3*numpy*core*include' | head -n1)"
+                local py3_executable=$(find ${deps_path}/ -type f -wholename '*bin/python3*' | sort | head -n1)
+                local py3_numpy_version="$(cat $(find ${deps_path}/ -wholename '*python3*numpy-*.egg*' | grep -i 'PKG-INFO') | grep -i "version" | tail -n1 | awk '{ print $2 }')"
+            fi
             local py3_inc="$(find ${deps_path}/ -type d -wholename '*include/python3*')"
             local py3_lib="$(find ${deps_path}/ -iname '*libpython3*.so' | head -n1)"
-            local py3_np_inc="$(find ${deps_path}/ -wholename '*python3*numpy*core*include' | head -n1)"
-            local py3_executable=$(find ${deps_path}/ -type f -wholename '*bin/python3*' | sort | head -n1)
 
             if [ -z "$py3_executable" ]; then
               log_failure_msg "not found python${py3_version} executable."
@@ -327,7 +352,7 @@ function cmakegen() {
             FLAGS+=" -DPYTHON3_INCLUDE_PATH=${py3_inc}"
             FLAGS+=" -DPYTHON3_LIBRARIES=${py3_lib}"
             FLAGS+=" -DPYTHON3_NUMPY_INCLUDE_DIRS=${py3_np_inc}"
-            FLAGS+=" -DPYTHON3_NUMPY_VERSION=$(cat $(find ${deps_path}/ -wholename '*python3*numpy-*.egg*' | grep -i 'PKG-INFO') | grep -i "version" | tail -n1 | awk '{ print $2 }')"
+            FLAGS+=" -DPYTHON3_NUMPY_VERSION=${py3_numpy_version}"
         }
 
         FLAGS+=" -DGCC_COMPILER_VERSION=${gcc_version}"
