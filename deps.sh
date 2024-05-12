@@ -97,9 +97,12 @@ function install_deps() {
         yesnoPrompt "Do you want to automatically download these dependencies locally? [Y/n] " && make_local_deps="yes"
     }
 
-    apt-get --allow-unauthenticated install wget unzip checkinstall build-essential cmake yasm pkg-config ||  {
-        log_warn_msg "wget unzip checkinstall build-essential cmake yasm pkg-config"
-    }
+    package_file="wget unzip checkinstall build-essential cmake yasm pkg-config"
+    for p in $package_file; do
+        yesnoPrompt "install package: $p [Y/n] " && apt-get --allow-unauthenticated install $p || {
+                    log_warn_msg "couldn't install $p"
+        }
+    done
 
     echo "$FLAGS" | grep "V4L=ON" 1>/dev/null && {
         apt-get --allow-unauthenticated install libv4l-dev || {
