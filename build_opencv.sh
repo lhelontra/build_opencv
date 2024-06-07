@@ -189,22 +189,18 @@ function cmakegen() {
         fi
         # apply patch in original file 
         cp -a ${WORKDIR}/opencv-${OPENCV_VERSION}/cmake/OpenCVFindOpenBLAS.cmake.origin ${WORKDIR}/opencv-${OPENCV_VERSION}/cmake/OpenCVFindOpenBLAS.cmake
-        sed -i '/FIND_PATH/c\FIND_PATH(OpenBLAS_INCLUDE_DIR NAMES cblas.h PATHS ${Open_BLAS_INCLUDE_SEARCH_PATHS} $ENV{Open_BLAS_INCLUDE_SEARCH_CROSSCOMP_PATHS} NO_DEFAULT_PATH)' ${WORKDIR}/opencv-${OPENCV_VERSION}/cmake/OpenCVFindOpenBLAS.cmake
-        sed -i '/FIND_LIBRARY/c\FIND_LIBRARY(OpenBLAS_LIB NAMES openblas libopenblas PATHS ${Open_BLAS_LIB_SEARCH_PATHS} $ENV{Open_BLAS_LIB_SEARCH_CROSSCOMP_PATHS} NO_DEFAULT_PATH)' ${WORKDIR}/opencv-${OPENCV_VERSION}/cmake/OpenCVFindOpenBLAS.cmake
-
         # insert includes paths
-        local blas_inc_paths="$(find "${deps_path}" -iname '*blas*' -type d | grep -i 'include' | grep -v 'lib' | grep -v 'share' | grep -v 'pthread' | grep -v 'serial' | tr '\n' ';')"
-        blas_inc_paths+="${deps_path}/usr/include/openblas-base;${deps_path}/usr/include/openblas"
-        export Open_BLAS_INCLUDE_SEARCH_CROSSCOMP_PATHS="$blas_inc_paths"
+        local blas_inc_paths="$(find "${deps_path}" -iname '*blas*' -type f | grep -i 'include' | grep -v 'eigen' | while read f; do echo "$(dirname $f)"; done | sort | uniq | grep -v 'pthread' | grep -v 'serial' | grep -v 'blis' | grep -v 'blis' | tr '\n' ' ')"
+        blas_inc_paths+=" ${deps_path}/usr/include/openblas-base ${deps_path}/usr/include/openblas"
         # insert libraries paths
-        local blas_libs_path="$(find "${deps_path}" -iname '*blas*' -type d | grep -i lib | grep -v 'include' | grep -v 'share' | grep -v 'pthread' | grep -v 'serial' | tr '\n' ';')"
-        blas_libs_path+="${deps_path}/usr/lib;"
-        export Open_BLAS_LIB_SEARCH_CROSSCOMP_PATHS="$blas_libs_path"
-
+        local blas_libs_path="$(find "${deps_path}" -iname '*blas*' -type f | grep -i 'so' | grep -v 'eigen' | while read f; do echo "$(dirname $f)"; done | sort | uniq | grep -v 'pthread' | grep -v 'serial' | grep -v 'blis' | tr '\n' ' ')"
+        blas_libs_path+=" ${deps_path}/usr/lib"
         local blas_lapack_dir="$(dirname $(find "${deps_path}" -iwholename '*include*/*blas*' | grep -v 'Eigen' | tail -n1))"
         cp -a "${blas_lapack_dir}"/cblas-atlas.h "${deps_path}"/usr/include/cblas.h &>/dev/null
         cp -a "${blas_lapack_dir}"/cblas* "${deps_path}"/usr/include/ &>/dev/null
         cp -a "${blas_lapack_dir}"/clapack.h "${deps_path}"/usr/include/ &>/dev/null
+        sed -i "/FIND_PATH/c\FIND_PATH(OpenBLAS_INCLUDE_DIR NAMES cblas.h PATHS ${blas_inc_paths} NO_DEFAULT_PATH)" ${WORKDIR}/opencv-${OPENCV_VERSION}/cmake/OpenCVFindOpenBLAS.cmake
+        sed -i "/FIND_LIBRARY/c\FIND_LIBRARY(OpenBLAS_LIB NAMES openblas libopenblas PATHS ${blas_libs_path} NO_DEFAULT_PATH)" ${WORKDIR}/opencv-${OPENCV_VERSION}/cmake/OpenCVFindOpenBLAS.cmake
     fi
 
     if [ "$CROSS_COMPILER" == "yes" ]; then
