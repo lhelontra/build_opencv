@@ -23,5 +23,9 @@ apt-get update
 ./build_opencv.sh -c configs/odroidc2.conf --build
 ```
 
+## issues
+opencv 4.10.0 fails when build with tbb.
+for  fix issue, replace `3rdparty/tbb/CMakeLists.txt` for https://github.com/opencv/opencv/blob/4.9.0/3rdparty/tbb/CMakeLists.txt 
+
 ## License
 The file LICENSE applies to other files in this repository. I want to stress that a majority of the lines of code found in the guide of this repository was created by others. If any of those original authors want more prominent attribution, please contact me and we can figure out how to make it acceptable.
