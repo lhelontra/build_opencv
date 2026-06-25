@@ -375,6 +375,10 @@ function cmakegen() {
         FLAGS+=" -DCMAKE_STRIP=${CROSSTOOL_DIR}/bin/${CROSSTOOL_NAME}-strip"
         FLAGS+=" -DCMAKE_C_COMPILER=${CROSSTOOL_DIR}/bin/${CROSSTOOL_NAME}-gcc"
         FLAGS+=" -DCMAKE_CXX_COMPILER=${CROSSTOOL_DIR}/bin/${CROSSTOOL_NAME}-g++"
+        FLAGS+=" -DCMAKE_ASM_COMPILER=${CROSSTOOL_DIR}/bin/${CROSSTOOL_NAME}-gcc"
+        FLAGS+=" -DCMAKE_ASM_COMPILER_AR=${CROSSTOOL_DIR}/bin/${CROSSTOOL_NAME}-ar"
+        FLAGS+=" -DCMAKE_ASM_COMPILER_RANLIB=${CROSSTOOL_DIR}/bin/${CROSSTOOL_NAME}-ranlib"
+
         # fix some toolchains that do not support -mthumb
         if [ ! -z "${CROSSTOOL_C_CXX_FLAGS}" ]; then
             FLAGS+=" -DCMAKE_C_FLAGS=${CROSSTOOL_C_CXX_FLAGS}"
